@@ -1,0 +1,14 @@
+#map{
+  width: 80%;
+  float:right;
+}
+#settings{
+  width:20%;
+  float:left;
+}
+#choices{
+  margin-left: 10%;
+}
+#updated{
+  text-align: center;
+}
