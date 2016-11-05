@@ -1,63 +1,48 @@
 var map, src = "https://data.montgomerycountymd.gov/resource/ms8i-8ux3.json?date_of_stop=";
 
 var markersArray = [];
-var attributesChecked = [
-    // 0 = false, 1 = true
-    // Dear God Yiyi, why
-    ["accident", [
-        [false, "Yes"],
-        [false, "No"]
-    ]],
-    ["gender", [
-        [false, "M"],
-        [false, "F"]
-    ]],
-    ["fatal", [
-        [false, "Yes"],
-        [false, "No"]
-    ]],
-    ["race", [
-        [false, "WHITE"],
-        [false, "ASIAN"],
-        [false, "BLACK"],
-        [false, "OTHER"]
-    ]],
-    ["violation_type", [
-        [false, "Citation"],
-        [false, "Warning"]
-    ]]
-];
+var attributesChecked = {
+    "accident": {
+        "Yes": false,
+        "No": false
+    },
+    "gender": {
+        "M": false,
+        "F": false
+    },
+    "fatal": {
+        "Yes": false,
+        "No": false
+    },
+    "race": { // Yes, why not feed the racists Yiyi
+        "WHITE": false,
+        "ASIAN": false,
+        "BLACK": false,
+        "OTHER": false
+    },
+    "violation_type": {
+        "Citation": false,
+        "Warning": false
+    }
+};
 
 function resetAttribute(attribute) {
-    var attributeToReset;
-    switch (attribute) {
-        case "accident":
-            attributeToReset = 0;
-            break;
-        case "gender":
-            attributeToReset = 1;
-            break;
-        case "fatal":
-            attributeToReset = 2;
-            break;
-        case "race":
-            attributeToReset = 3;
-            break;
-        case "violation_type":
-            attributeToReset = 4;
-            break;
-        case "all":
-            attributeToReset = -1;
-            break;
-    }
-    if (attributeToReset != -1) {
-        for (var i = 0; i < attributesChecked[attributeToReset][1].length; i++) {
-            attributesChecked[attributeToReset][1][i][0] = false;
+    if (attribute != "all") {
+        // Reset selected attribute
+        for (var setting in attributesChecked[attribute]) {
+            if (attributesChecked[attribute].hasOwnProperty(setting)) {
+                attributesChecked[attribute][setting] = false;
+            }
         }
     } else {
-        for (var j = 0; j < attributesChecked.length; j++) {
-            for (var i = 0; i < attributesChecked[j][1].length; i++) {
-                attributesChecked[j][1][i][0] = false;
+        // Reset all attributes
+        for (var attr in attributesChecked) {
+            if (attributesChecked.hasOwnProperty(attr)) {
+                for (var setting in attributesChecked[attr]) {
+                    if (attributesChecked[attr].hasOwnProperty(setting)) {
+                        attributesChecked[attr][setting] = false;
+                    }
+                }
             }
         }
     }
@@ -68,14 +53,14 @@ function setOnMap() {
     for (var i = 0; i < markersArray.length; i++) {
         var check = true;
         var tempMarker = markersArray[i];
-        for (var j = 0; j < attributesChecked.length; j++) { // Iterate through all the attributes
-            var attributeChoices = attributesChecked[j][1];
-            for (var k = 0; k < attributeChoices.length; k++) {
-                var tempAttribute = attributeChoices[k];
-
-                if (tempAttribute[0] == true) {
-                    if (tempMarker[attributesChecked[j][0]] != tempAttribute[1]) {
-                        check = false;
+        for (var attr in attributesChecked) {
+            if (attributesChecked.hasOwnProperty(attr)) {
+                var attributeChoices = attributesChecked[attr];
+                for (var setting in attributeChoices) {
+                    if (attributeChoices.hasOwnProperty(setting)) {
+                        if (attributeChoices[setting] && tempMarker[attr] != setting) {
+                            check = false;
+                        }
                     }
                 }
             }
@@ -91,65 +76,65 @@ function setOnMap() {
 function initListeners() {
     document.getElementById("accidentYes").addEventListener("click", function() {
         resetAttribute("accident");
-        attributesChecked[0][1][0][0] = true;
+        attributesChecked.accident.Yes = true;
         setOnMap();
     });
     document.getElementById("accidentNo").addEventListener("click", function() {
         resetAttribute("accident");
-        attributesChecked[0][1][1][0] = true;
+        attributesChecked.accident.No = true;
         setOnMap();
     });
     document.getElementById("genderMale").addEventListener("click", function() {
         resetAttribute("gender");
-        attributesChecked[1][1][0][0] = true;
+        attributesChecked.gender.M = true;
         setOnMap();
     });
     document.getElementById("genderFemale").addEventListener("click", function() {
         resetAttribute("gender");
-        attributesChecked[1][1][1][0] = true;
+        attributesChecked.gender.F = true;
         setOnMap();
     });
     document.getElementById("fatalYes").addEventListener("click", function() {
         resetAttribute("fatal");
-        attributesChecked[2][1][0][0] = true;
+        attributesChecked.fatal.Yes = true;
         setOnMap();
     });
     document.getElementById("fatalNo").addEventListener("click", function() {
         resetAttribute("fatal");
-        attributesChecked[2][1][1][0] = true;
+        attributesChecked.fatal.No = true;
         setOnMap();
     });
     document.getElementById("raceWhite").addEventListener("click", function() {
         resetAttribute("race");
-        attributesChecked[3][1][0][0] = true;
+        attributesChecked.race.WHITE = true;
         setOnMap();
     });
     document.getElementById("raceAsian").addEventListener("click", function() {
         resetAttribute("race");
-        attributesChecked[3][1][1][0] = true;
+        attributesChecked.race.ASIAN = true;
         setOnMap();
     });
     document.getElementById("raceBlack").addEventListener("click", function() {
         resetAttribute("race");
-        attributesChecked[3][1][2][0] = true;
+        attributesChecked.race.BLACK = true;
         setOnMap();
     });
     document.getElementById("raceOther").addEventListener("click", function() {
         resetAttribute("race");
-        attributesChecked[3][1][3][0] = true;
+        attributesChecked.race.OTHER = true;
         setOnMap();
     });
     document.getElementById("vioCitation").addEventListener("click", function() {
         resetAttribute("violation_type");
-        attributesChecked[4][1][0][0] = true;
+        attributesChecked.violation_type.Citation = true;
         setOnMap();
     });
     document.getElementById("vioWarning").addEventListener("click", function() {
         resetAttribute("violation_type");
-        attributesChecked[4][1][1][0] = true;
+        attributesChecked.violation_type.Warning = true;
         setOnMap();
     });
-    document.getElementById("showall").addEventListener("click", function() {
+    document.getElementById("showAll").addEventListener("click", function() {
         document.getElementById("accidentNo").checked = false;
         document.getElementById("accidentYes").checked = false;
         document.getElementById("genderMale").checked = false;
