@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0">
-    <meta name="description" content="A webpage by Justin Kuang that shows Montgomery County Traffic Violations in the past day"/>
-    <meta name="author" content="Justin Kuang"/>
+    <meta name="description" content="A webpage by Justin Kuang that shows Montgomery County Traffic Violations in the past day" />
+    <meta name="author" content="Justin Kuang" />
 
     <title>Montgomery County Traffic Violation Visualizer</title>
     <link rel="stylesheet" href="911.css">
@@ -15,62 +15,59 @@
             height: 100%;
             margin: 0;
             padding: 0;
-
         }
 
         #map {
             height: 100%;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBhJLugJn6M4vCyjVLtiRX3l5BIDYLpzA&callback=initMap" async defer></script>
-    <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <!-- Way too many APIs for something like this -->
+    <script type="text/javascript" src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
+    <script type="text/javascript" src="http://momentjs.com/downloads/moment-timezone-with-data.js"></script>
+    <script type="text/javascript" src="911.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBhJLugJn6M4vCyjVLtiRX3l5BIDYLpzA&callback=initMap" async defer></script>
 </head>
 
 <body>
 
     <div id="map"></div>
     <div id="settings">
-    <h2 id="updated"></h2>
+        <h2 id="updated"></h2>
 
-      <form id=choices>
-        <h2>Attributes</h2>
-        Accident:<br>
-        <input type="radio" name="Accident" value="male" id="accidentYes"> Yes <br>
-        <input type="radio" name="Accident" value="female" id="accidentNo"> No
+        <form id="choices" action="javascript:return false;">
+            <h2>Attributes</h2> Accident:
+            <br>
+            <input type="radio" name="Accident" value="male" id="accidentYes"> Yes <br>
+            <input type="radio" name="Accident" value="female" id="accidentNo"> No
 
-        <br><br>
-        Gender:<br>
-        <input type="radio" name="gender" value="male" id="genderMale"> Male <br>
-        <input type="radio" name="gender" value="female" id="genderFemale"> Female
+            <br><br> Gender:
+            <br>
+            <input type="radio" name="gender" value="male" id="genderMale"> Male <br>
+            <input type="radio" name="gender" value="female" id="genderFemale"> Female
 
-        <br><br>
-        Fatal:<br>
-        <input type="radio" name="fatal" value="Yes" id="fatalYes"> Yes <br>
-        <input type="radio" name="fatal" value="No" id="fatalNo"> No
-        <br><br>
-        Race:<br>
-        <input type="radio" name="race" value="white" id="raceWhite"> White <br>
-        <input type="radio" name="race" value="black" id="raceBlack"> Black <br>
-        <input type="radio" name="race" value="asian" id="raceAsian"> Asian <br>
-        <input type="radio" name="race" value="other" id="raceOther"> Other
-        <br>
-        <br>
-        Violation Type:<br>
-        <input type="radio" name="violation_type" value="citation" id="vioCitation"> Citation<br>
-        <input type="radio" name="violation_type" value="warning" id="vioWarning"> Warning
-      <br>
-      <br>
-        <button id="showall">reset the idiot drivers</button>
-
-      </form>
-    </br>
-  </br>
-  <h4 id="returnlink">return to <a href="http://justinkuang.com">justinkuang.com</a></h4>
-
-
-
+            <br><br> Fatal:
+            <br>
+            <input type="radio" name="fatal" value="Yes" id="fatalYes"> Yes <br>
+            <input type="radio" name="fatal" value="No" id="fatalNo"> No
+            <br><br> Race:
+            <br>
+            <input type="radio" name="race" value="white" id="raceWhite"> White <br>
+            <input type="radio" name="race" value="black" id="raceBlack"> Black <br>
+            <input type="radio" name="race" value="asian" id="raceAsian"> Asian <br>
+            <input type="radio" name="race" value="other" id="raceOther"> Other
+            <br>
+            <br> Violation Type:<br>
+            <input type="radio" name="violation_type" value="citation" id="vioCitation"> Citation<br>
+            <input type="radio" name="violation_type" value="warning" id="vioWarning"> Warning
+            <br>
+            <br>
+            <button id="showAll">reset the idiot drivers</button>
+        </form>
+        </br>
+        </br>
+        <h4 id="returnlink">return to <a href="http://justinkuang.com">justinkuang.com</a></h4>
     </div>
-    <script src="911.js"></script>
 </body>
 
 </html>
