@@ -41,7 +41,7 @@ function resetAttributes() {
 
 
 function setOnMap() {
-    if(openInfoWindow) openInfoWindow.close();
+    if (openInfoWindow) openInfoWindow.close();
     markersArray.forEach(marker => {
         let check = true;
         for (let attr in attributesChecked) {
@@ -152,11 +152,11 @@ function getTrafficData(src) {
     $.getJSON(src, function (data) {
         data.forEach(dp => {
             let description = "<p>"
-                + dp.description
-                + "</br></br> This driver is from: "
-                + dp.driver_city + " "
+                + dp.description[0] + dp.description.slice(1).toLowerCase()
+                + ".</br></br> Hometown: "
+                + dp.driver_city + ", "
                 + dp.driver_state
-                + "</br></br>car: "
+                + "</br></br>Vehicle: "
                 + dp.color + " " + dp.make + " " + dp.model
                 + "</p> ";
             let infowindow = new google.maps.InfoWindow({
@@ -184,7 +184,7 @@ function getTrafficData(src) {
                 google.maps.event.addListener(marker, 'click', function () {
                     infowindow.setContent(this.info);
                     infowindow.open(map, this);
-                    if(openInfoWindow) openInfoWindow.close();
+                    if (openInfoWindow) openInfoWindow.close();
                     openInfoWindow = infowindow;
                 });
             }
