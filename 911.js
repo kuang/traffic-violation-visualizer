@@ -148,15 +148,11 @@ function grabData() {
     getTrafficData(src);
 }
 
-function toSentenceCase(s) {
-    return s[0] + s.slice(1).toLowerCase()
-}
-
 function getTrafficData(src) {
     $.getJSON(src, function (data) {
         data.forEach(dp => {
             let description = "<p>"
-                + toSentenceCase(dp.description)
+                + dp.description[0] + dp.description.slice(1).toLowerCase()
                 + ".</br></br> Hometown: "
                 + dp.driver_city + ", "
                 + dp.driver_state
