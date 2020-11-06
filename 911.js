@@ -41,6 +41,7 @@ function resetAttributes() {
 
 
 function setOnMap() {
+    if(openInfoWindow) openInfoWindow.close();
     markersArray.forEach(marker => {
         let check = true;
         for (let attr in attributesChecked) {
