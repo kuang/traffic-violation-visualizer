@@ -1,78 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta name="description" content="A webpage by Justin Kuang that shows Montgomery County Traffic Violations in the past day" />
-    <meta name="author" content="Justin Kuang" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Visualize Montgomery County traffic violations from the past day on an interactive map">
+    <meta name="author" content="Justin Kuang">
     <title>Montgomery County Traffic Violation Visualizer</title>
     <link rel="stylesheet" href="911.css">
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            height: 100%;
-        }
-    </style>
-    <!-- Way too many APIs for something like this -->
-    <script type="text/javascript" src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
-    <script type="text/javascript" src="http://momentjs.com/downloads/moment.js"></script>
-    <script type="text/javascript" src="http://momentjs.com/downloads/moment-timezone-with-data.js"></script>
-    <script type="text/javascript" src="911.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBhJLugJn6M4vCyjVLtiRX3l5BIDYLpzA&callback=initMap" async defer></script>
+    <script src="911.js" defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBhJLugJn6M4vCyjVLtiRX3l5BIDYLpzA&callback=initMap" async defer></script>
 </head>
 
 <body>
-
-    <div id="map"></div>
     <div id="settings">
         <h2 id="updated"></h2>
 
-        <form id="choices" action="javascript:return null;">
-            <h2>Attributes</h2> Accident:
-            <br>
-            <input type="radio" name="Accident" value="male" id="accidentYes"> Yes <br>
-            <input type="radio" name="Accident" value="female" id="accidentNo"> No
+        <div class="date-nav">
+            <button type="button" id="prevDay" title="Previous day">&larr;</button>
+            <input type="date" id="datePicker">
+            <button type="button" id="nextDay" title="Next day">&rarr;</button>
+        </div>
 
-            <br><br> DUI:
-            <br>
-            <input type="radio" name="dui" value="Yes" id="duiYes"> Yes <br>
-            <input type="radio" name="dui" value="No" id="duiNo"> No
+        <form id="choices" action="javascript:void(0)">
+            <h2>Attributes</h2>
 
-            <br><br> Gender:
-            <br>
-            <input type="radio" name="gender" value="male" id="genderMale"> Male <br>
-            <input type="radio" name="gender" value="female" id="genderFemale"> Female
+            <div class="filter-group">
+                <strong>Accident</strong>
+                <label><input type="radio" name="Accident" value="yes" id="accidentYes"> Yes</label>
+                <label><input type="radio" name="Accident" value="no" id="accidentNo"> No</label>
+            </div>
 
-            <br><br> Fatal:
-            <br>
-            <input type="radio" name="fatal" value="Yes" id="fatalYes"> Yes <br>
-            <input type="radio" name="fatal" value="No" id="fatalNo"> No
-            <br><br> Race:
-            <br>
-            <input type="radio" name="race" value="white" id="raceWhite"> White <br>
-            <input type="radio" name="race" value="black" id="raceBlack"> Black <br>
-            <input type="radio" name="race" value="asian" id="raceAsian"> Asian <br>
-            <input type="radio" name="race" value="other" id="raceOther"> Other
-            <br>
-            <br> Violation Type:<br>
-            <input type="radio" name="violation_type" value="citation" id="vioCitation"> Citation<br>
-            <input type="radio" name="violation_type" value="warning" id="vioWarning"> Warning
-            <br>
-            <br>
-            <button id="showAll">reset the idiot drivers</button>
+            <div class="filter-group">
+                <strong>DUI</strong>
+                <label><input type="radio" name="dui" value="Yes" id="duiYes"> Yes</label>
+                <label><input type="radio" name="dui" value="No" id="duiNo"> No</label>
+            </div>
+
+            <div class="filter-group">
+                <strong>Gender</strong>
+                <label><input type="radio" name="gender" value="male" id="genderMale"> Male</label>
+                <label><input type="radio" name="gender" value="female" id="genderFemale"> Female</label>
+            </div>
+
+            <div class="filter-group">
+                <strong>Fatal</strong>
+                <label><input type="radio" name="fatal" value="Yes" id="fatalYes"> Yes</label>
+                <label><input type="radio" name="fatal" value="No" id="fatalNo"> No</label>
+            </div>
+
+            <div class="filter-group">
+                <strong>Race</strong>
+                <label><input type="radio" name="race" value="white" id="raceWhite"> White</label>
+                <label><input type="radio" name="race" value="black" id="raceBlack"> Black</label>
+                <label><input type="radio" name="race" value="asian" id="raceAsian"> Asian</label>
+                <label><input type="radio" name="race" value="other" id="raceOther"> Other</label>
+            </div>
+
+            <div class="filter-group">
+                <strong>Violation Type</strong>
+                <label><input type="radio" name="violation_type" value="citation" id="vioCitation"> Citation</label>
+                <label><input type="radio" name="violation_type" value="warning" id="vioWarning"> Warning</label>
+            </div>
+
+            <button id="showAll" type="button">Reset filters</button>
         </form>
-        </br>
-        </br>
-        <h4 id="returnlink">return to <a href="http://justinkuang.com">justinkuang.com</a></h4>
+
+        <h4 id="returnlink">return to <a href="https://justinkuang.com">justinkuang.com</a></h4>
     </div>
+    <div id="map"></div>
 </body>
 
 </html>

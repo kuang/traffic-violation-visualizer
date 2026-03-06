@@ -1,193 +1,201 @@
-let map, src = "https://data.montgomerycountymd.gov/resource/ms8i-8ux3.json?date_of_stop=";
+const API_BASE = "https://data.montgomerycountymd.gov/resource/ms8i-8ux3.json";
+const API_LIMIT = 5000;
+
+let map;
 let openInfoWindow;
 let markersArray = [];
 let attributesChecked = {
-    // bool
-    "dui": null,
-    "accident": null,
-    // M, F
-    "gender": null,
-    // bool
-    "fatal": null,
-    // WHITE", "ASIAN", "BLACK", "OTHER", "None"
-    // Yes, why not feed the racists Yiyi
-    "race": null,
-    // Citation, Warning
-    "violation_type": null
+    dui: null,
+    accident: null,
+    gender: null,
+    fatal: null,
+    race: null,
+    violation_type: null
 };
 
 function resetAttributes() {
-    document.getElementById("accidentNo").checked = false;
-    document.getElementById("accidentYes").checked = false;
-    document.getElementById("duiNo").checked = false;
-    document.getElementById("duiYes").checked = false;
-    document.getElementById("genderMale").checked = false;
-    document.getElementById("genderFemale").checked = false;
-    document.getElementById("fatalYes").checked = false;
-    document.getElementById("fatalNo").checked = false;
-    document.getElementById("raceWhite").checked = false;
-    document.getElementById("raceBlack").checked = false;
-    document.getElementById("raceAsian").checked = false;
-    document.getElementById("raceOther").checked = false;
-    document.getElementById("vioWarning").checked = false;
-    document.getElementById("vioCitation").checked = false;
-
-    // Reset all attributes
-    for (let attr in attributesChecked) {
+    document.querySelectorAll('#choices input[type="radio"]').forEach(r => r.checked = false);
+    for (const attr in attributesChecked) {
         attributesChecked[attr] = null;
     }
-
 }
-
 
 function setOnMap() {
     if (openInfoWindow) openInfoWindow.close();
     markersArray.forEach(marker => {
-        let check = true;
-        for (let attr in attributesChecked) {
-            if (attributesChecked[attr] != null && attributesChecked[attr] != marker[attr]) {
-                check = false;
+        let visible = true;
+        for (const attr in attributesChecked) {
+            if (attributesChecked[attr] != null && attributesChecked[attr] !== marker[attr]) {
+                visible = false;
+                break;
             }
         }
-        if (check) {
-            marker.setMap(map);
-        } else {
-            marker.setMap(null);
-        }
+        marker.setMap(visible ? map : null);
     });
+}
+
+function clearMarkers() {
+    markersArray.forEach(m => m.setMap(null));
+    markersArray = [];
+    if (openInfoWindow) {
+        openInfoWindow.close();
+        openInfoWindow = null;
+    }
+}
+
+function formatDateParam(date) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+function loadDate(date) {
+    clearMarkers();
+    resetAttributes();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    document.getElementById("updated").textContent = `Showing data for ${month}/${day}`;
+    const url = `${API_BASE}?date_of_stop=${formatDateParam(date)}T00:00:00.000&$limit=${API_LIMIT}`;
+    getTrafficData(url);
 }
 
 function initListeners() {
-    document.getElementById("accidentYes").addEventListener("click", function () {
-        attributesChecked.accident = true;
-        setOnMap();
-    });
-    document.getElementById("accidentNo").addEventListener("click", function () {
-        attributesChecked.accident = false;
-        setOnMap();
-    });
-    document.getElementById("duiYes").addEventListener("click", function () {
-        attributesChecked.dui = true;
-        setOnMap();
-    });
-    document.getElementById("duiNo").addEventListener("click", function () {
-        attributesChecked.dui = false;
-        setOnMap();
-    });
-    document.getElementById("genderMale").addEventListener("click", function () {
-        attributesChecked.gender = 'M';
-        setOnMap();
-    });
-    document.getElementById("genderFemale").addEventListener("click", function () {
-        attributesChecked.gender = 'F';
-        setOnMap();
-    });
-    document.getElementById("fatalYes").addEventListener("click", function () {
-        attributesChecked.fatal = true;
-        setOnMap();
-    });
-    document.getElementById("fatalNo").addEventListener("click", function () {
-        attributesChecked.fatal = false;
-        setOnMap();
-    });
-    document.getElementById("raceWhite").addEventListener("click", function () {
-        attributesChecked.race = "WHITE";
-        setOnMap();
-    });
-    document.getElementById("raceAsian").addEventListener("click", function () {
-        attributesChecked.race = "ASIAN";
-        setOnMap();
-    });
-    document.getElementById("raceBlack").addEventListener("click", function () {
-        attributesChecked.race = "BLACK";
-        setOnMap();
-    });
-    document.getElementById("raceOther").addEventListener("click", function () {
-        attributesChecked.race = "OTHER";
-        setOnMap();
-    });
-    document.getElementById("vioCitation").addEventListener("click", function () {
-        attributesChecked.violation_type = "Citation";
-        setOnMap();
-    });
-    document.getElementById("vioWarning").addEventListener("click", function () {
-        attributesChecked.violation_type = "Warning";
-        setOnMap();
-    });
-    document.getElementById("showAll").addEventListener("click", function () {
+    const filters = {
+        accidentYes:  () => attributesChecked.accident = true,
+        accidentNo:   () => attributesChecked.accident = false,
+        duiYes:       () => attributesChecked.dui = true,
+        duiNo:        () => attributesChecked.dui = false,
+        genderMale:   () => attributesChecked.gender = "M",
+        genderFemale: () => attributesChecked.gender = "F",
+        fatalYes:     () => attributesChecked.fatal = true,
+        fatalNo:      () => attributesChecked.fatal = false,
+        raceWhite:    () => attributesChecked.race = "WHITE",
+        raceBlack:    () => attributesChecked.race = "BLACK",
+        raceAsian:    () => attributesChecked.race = "ASIAN",
+        raceOther:    () => attributesChecked.race = "OTHER",
+        vioCitation:  () => attributesChecked.violation_type = "Citation",
+        vioWarning:   () => attributesChecked.violation_type = "Warning",
+    };
+
+    for (const [id, setter] of Object.entries(filters)) {
+        document.getElementById(id).addEventListener("click", () => {
+            setter();
+            setOnMap();
+        });
+    }
+
+    document.getElementById("showAll").addEventListener("click", () => {
         resetAttributes();
         setOnMap();
     });
-    grabData();
+
+    const picker = document.getElementById("datePicker");
+    const prevBtn = document.getElementById("prevDay");
+    const nextBtn = document.getElementById("nextDay");
+    const defaultDate = getTargetDate();
+    const maxDate = formatDateParam(defaultDate);
+    picker.value = maxDate;
+    picker.max = maxDate;
+
+    function navigateToDate(dateStr) {
+        picker.value = dateStr;
+        nextBtn.disabled = dateStr >= maxDate;
+        const parts = dateStr.split("-");
+        loadDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+    }
+
+    function shiftDay(offset) {
+        const parts = picker.value.split("-");
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        d.setDate(d.getDate() + offset);
+        const newVal = formatDateParam(d);
+        if (newVal > maxDate) return;
+        navigateToDate(newVal);
+    }
+
+    picker.addEventListener("change", () => navigateToDate(picker.value));
+    prevBtn.addEventListener("click", () => shiftDay(-1));
+    nextBtn.addEventListener("click", () => shiftDay(1));
+    nextBtn.disabled = true;
+
+    loadDate(defaultDate);
 }
 
 function initMap() {
-    let myLatlng = new google.maps.LatLng(39.1547, -77.2405);
-    let mapOptions = {
+    map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
-        center: myLatlng
-    }
-    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        center: { lat: 39.1547, lng: -77.2405 }
+    });
     initListeners();
 }
 
-function getEasternTime() {
-    return moment().tz("America/New_York");
+function getTargetDate() {
+    // Use Intl to get the current Eastern Time hour
+    const now = new Date();
+    const etHour = parseInt(
+        new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: "America/New_York" }).format(now),
+        10
+    );
+    // Data from yesterday only available after 10 AM ET
+    const daysBack = etHour >= 10 ? 1 : 2;
+    const target = new Date(now);
+    target.setDate(target.getDate() - daysBack);
+    return target;
 }
 
-function grabData() {
-    let date = getEasternTime(); // CAUTION: returns moment.js object, not native Date()
-    // Data from yesterday only available if it's after 10 AM
-    if (date.hours() >= 10) {
-        date.subtract(1, "day");
-    } else {
-        date.subtract(2, "day");
-    }
-    document.getElementById("updated").innerHTML = "Showing data for " + (date.month() + 1) + "/" + date.date();
-    src += date.format("YYYY") + "-" + date.format("MM") + "-" + date.format("DD") + "T00:00:00.000";
-    getTrafficData(src);
-}
 
-function getTrafficData(src) {
-    $.getJSON(src, function (data) {
+async function getTrafficData(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
+        const data = await res.json();
+
         data.forEach(dp => {
-            let description = "<p>"
-                + dp.description[0] + dp.description.slice(1).toLowerCase()
-                + ".</br></br> Hometown: "
-                + dp.driver_city + ", "
-                + dp.driver_state
-                + "</br></br>Vehicle: "
-                + dp.color + " " + dp.make + " " + dp.model
-                + "</p> ";
-            let infowindow = new google.maps.InfoWindow({
-                content: description
+            const lat = parseFloat(dp.latitude);
+            const lng = parseFloat(dp.longitude);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const desc = dp.description
+                ? dp.description[0] + dp.description.slice(1).toLowerCase()
+                : "Unknown violation";
+
+            const city = dp.driver_city || "Unknown";
+            const state = dp.driver_state || "";
+            const color = dp.color || "";
+            const make = dp.make || "";
+            const model = dp.model || "";
+
+            const content = `<p><strong>${desc}</strong><br><br>
+                Hometown: ${city}, ${state}<br><br>
+                Vehicle: ${color} ${make} ${model}</p>`;
+
+            const infowindow = new google.maps.InfoWindow({ content });
+
+            const marker = new google.maps.Marker({
+                position: { lat, lng },
+                info: content
             });
-            let lat = dp.latitude;
-            let long = dp.longitude;
-            if (lat && long) {
-                let myLatln = new google.maps.LatLng(lat, long);
-                let marker = new google.maps.Marker({
-                    position: myLatln,
-                    title: "",
-                    info: description
-                });
-                marker.accident = dp.contributed_to_accident == "True";
-                marker.gender = dp.gender;
-                marker.fatal = dp.fatal == "Yes";
-                marker.race = dp.race;
-                marker.violation_type = dp.violation_type;
-                marker.dui = dp.alcohol == "Yes";
 
-                markersArray.push(marker);
+            marker.accident = dp.contributed_to_accident === "True";
+            marker.gender = dp.gender;
+            marker.fatal = dp.fatal === "Yes";
+            marker.race = dp.race;
+            marker.violation_type = dp.violation_type;
+            marker.dui = dp.alcohol === "Yes";
 
-                marker.setMap(map);
-                google.maps.event.addListener(marker, 'click', function () {
-                    infowindow.setContent(this.info);
-                    infowindow.open(map, this);
-                    if (openInfoWindow) openInfoWindow.close();
-                    openInfoWindow = infowindow;
-                });
-            }
+            markersArray.push(marker);
+            marker.setMap(map);
+
+            marker.addListener("click", () => {
+                infowindow.setContent(marker.info);
+                infowindow.open(map, marker);
+                if (openInfoWindow) openInfoWindow.close();
+                openInfoWindow = infowindow;
+            });
         });
-    });
+    } catch (err) {
+        console.error("Failed to load traffic data:", err);
+        document.getElementById("updated").textContent = "Error loading data";
+    }
 }
